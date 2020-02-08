@@ -7,7 +7,15 @@ import Students from "./components/Students"
 import Profile from "./components/Profile"
 import Results from "./components/Results"
 import { render } from '@testing-library/react';
+import { css } from "@emotion/core";
+// First way to import
+import {PacmanLoader} from "react-spinners";
 
+const  override = css`
+display: block;
+margin: 0 auto;
+border-color: red;
+`;
 
 
 class App extends React.Component {
@@ -34,8 +42,8 @@ class App extends React.Component {
       qualification : undefined,
       qualification_status : undefined,
       exam_center : undefined,
-      custom_error : undefined
-      
+      custom_error : undefined,
+      isLoading:false
     };
 
   }
@@ -73,6 +81,7 @@ class App extends React.Component {
 
   getData =async (e,studNon,examPeriod,year)=>{
     e.preventDefault();
+    this.setState({isLoading:true})
     //const student_Number= e.target.studentNo.value
     const student_Number = studNon
     //const year = e.target.year.value
@@ -104,36 +113,54 @@ class App extends React.Component {
       title : contact.title,
       qualification : contact.qualificationDescription,
       qualification_status : contact.academicRecordStatusDescription,
-      exam_center : contact.studentExamCentres[0].currentExamCentreDescription
+      exam_center : contact.studentExamCentres[0].currentExamCentreDescription,
+      isLoading:false
        
     })
       
   } //end of getDate function
 
+ 
+
+
+
 //start of render functiom
   render(){
-    const {results,status} =  this.state;
+    const {results,status,studentNo,contacts,exam_center,dateOfBirth,name,title,surname,qualification_status,qualification, isLoading} =  this.state;
    
     
     return (
+      
       <div className="container mt-3">
+       
         <Form doNotDisplay={this.doNotDisplay} />
         <div className="row ">
               <Students
-              studentNo={this.state.studentNo}
-              qualification={this.state.qualification}
-              qualification_status={this.state.qualification_status}
-              surname={this.state.surname}
-              title={this.state.title}
-              name={this.state.name}
-              dateOfBirth={this.state.dateOfBirth}
-              exam_center={this.state.exam_center}
+              studentNo={studentNo}
+              qualification={qualification}
+              qualification_status={qualification_status}
+              surname={surname}
+              title={title}
+              name={name}
+              dateOfBirth={dateOfBirth}
+              exam_center={exam_center}
               />
-            {this.state.studentNo  ? <Profile contacts={this.state.contacts} /> : <div></div>}
+            {studentNo  ? <Profile contacts={contacts} /> : <div></div>}
         </div>
         
-         {this.state.results && this.state.studentNo ? <Results results={this.state.results} /> : this.state.error}
-         {this.state.studentNo && this.state.contacts && this.state.exam_center ?  <div></div> : this.state.custom_error}
+        {isLoading === true ? 
+        <PacmanLoader
+        //css={override}
+        size={55}
+        margin={2}
+        //size={"150px"} this also works
+        color={"#555"}
+        loading={isLoading}
+      />
+      : console.log('true')}
+
+         {results && studentNo ? <Results results={results} /> : this.state.error}
+         {studentNo && contacts && exam_center ?  <div></div> : this.state.custom_error}
       </div>
 
     )
